@@ -1,36 +1,23 @@
-<!--
-  前端项目说明文档
-  记录启动方式、代理配置和部署时的环境变量
--->
+# Ecommerce Insight Agent Frontend
 
-# Shopkeeper Agent Frontend
+“电商智能问数平台”的 Web 前端，使用 React、TypeScript、Vite、Tailwind CSS 和 pnpm 构建。
 
-匹配后端 `shopkeeper-agent` 的问数聊天前端，技术栈为 React + Vite + Tailwind CSS + pnpm。
+## 本地开发
 
-## 启动
-
-```bash
-cd frontend
-pnpm install
-pnpm dev
+```powershell
+pnpm install --frozen-lockfile
+pnpm run dev
 ```
 
-默认开发代理会把 `/api` 转发到 `http://127.0.0.1:8000`，对应后端的 `POST /api/query` SSE 接口。
+默认访问 `http://localhost:5173`，并把 `/api` 代理到 `http://127.0.0.1:8000`。可在 `.env` 中通过 `VITE_DEV_PROXY_TARGET` 修改开发代理地址。
 
-如需修改后端地址：
+## 质量检查
 
-```bash
-cp .env.example .env
+```powershell
+pnpm run lint
+pnpm run build
 ```
 
-然后调整：
+## 容器部署
 
-```bash
-VITE_DEV_PROXY_TARGET=http://127.0.0.1:8000
-```
-
-如果前端与后端不在同一域部署，可设置：
-
-```bash
-VITE_API_BASE_URL=http://127.0.0.1:8000
-```
+生产镜像使用 Nginx 托管静态资源，并把 `/api` 反向代理到 Compose 中的 `backend:8000` 服务。建议从项目根目录通过 Docker Compose 构建和启动。

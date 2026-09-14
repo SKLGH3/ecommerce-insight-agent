@@ -1,8 +1,8 @@
 {
-  "name": "shopkeeper-agent-frontend",
-  "description": "电商问数智能体前端项目，提供聊天式问数界面和 SSE 流程展示。",
+  "name": "ecommerce-insight-agent-frontend",
+  "description": "电商智能问数平台前端，提供聊天式问数、SQL 安全闭环和 SSE 流程展示。",
   "private": true,
-  "version": "0.1.0",
+  "version": "0.2.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -26,5 +26,5 @@
     "typescript": "^5.7.3",
     "vite": "^6.1.0"
   },
-  "packageManager": "pnpm@10.33.0"
+  "packageManager": "pnpm@11.19.0"
 }

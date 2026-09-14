@@ -1,45 +1,43 @@
-"""
-SQL 校验节点
-
-负责在真正执行查询前，用数据库解析一次生成的 SQ
-校验结果不在这里决定流程走向，而是通过 state["error"] 交给 graph.py 的条件边判断
-"""
+"""SQL 校验节点。"""
 
 from langgraph.runtime import Runtime
 
 from app.agent.context import DataAgentContext
 from app.agent.state import DataAgentState
+from app.conf.app_config import app_config
 from app.core.log import logger
 from app.repositories.mysql.dw.dw_mysql_repository import DWMySQLRepository
+from app.security.sql_guard import SQLGuardPolicy, guard_read_only_sql
 
 
 async def validate_sql(state: DataAgentState, runtime: Runtime[DataAgentContext]):
-    """校验 SQL，并返回 error 字段控制后续条件分支"""
+    """执行程序级安全检查和数据库 EXPLAIN 校验。"""
 
     writer = runtime.stream_writer
     step = "校验SQL"
     writer({"type": "progress", "step": step, "status": "running"})
 
+    sql = state["sql"]
+    table_infos = state.get("table_infos", [])
+    allowed_tables = {table["name"] for table in table_infos}
+    dw_mysql_repository: DWMySQLRepository = runtime.context["dw_mysql_repository"]
+
     try:
-        # 读取 generate_sql 或 correct_sql 写入状态的候选 SQL
-        sql = state["sql"]
-
-        # SQL 可用性必须交给真实数仓判断，这里从运行时上下文取 DW Repository
-        dw_mysql_repository: DWMySQLRepository = runtime.context["dw_mysql_repository"]
-
-        try:
-            # validate 内部使用 explain <sql>，只关心数据库能否成功解析这条 SQL
-            await dw_mysql_repository.validate(sql)
-            writer({"type": "progress", "step": step, "status": "success"})
-            logger.info("SQL语法正确")
-            return {"error": None}
-        except Exception as e:
-            # 不抛出异常中断图执行，而是把错误写入状态，供条件分支进入 correct_sql
-            logger.info(f"SQL语法错误：{str(e)}")
-            writer({"type": "progress", "step": step, "status": "success"})
-            return {"error": str(e)}
-
-    except Exception as e:
-        logger.error(f"{step} failed: {e}")
+        safe_sql = guard_read_only_sql(
+            sql,
+            allowed_tables=allowed_tables,
+            policy=SQLGuardPolicy(
+                max_length=app_config.sql_safety.max_length,
+                max_result_rows=app_config.sql_safety.max_result_rows,
+                allowed_schemas=(app_config.db_dw.database,),
+            ),
+        )
+        await dw_mysql_repository.validate(safe_sql)
+        writer({"type": "progress", "step": step, "status": "success"})
+        logger.info(f"SQL 安全检查和 EXPLAIN 校验通过：{safe_sql}")
+        return {"sql": safe_sql, "error": None}
+    except Exception as exc:
+        error = str(exc)
+        logger.warning(f"SQL 校验失败：{error}")
         writer({"type": "progress", "step": step, "status": "error"})
-        raise
+        return {"error": error}

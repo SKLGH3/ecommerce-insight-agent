@@ -1,0 +1,11 @@
+.git
+.venv
+__pycache__
+*.py[cod]
+.env
+logs
+frontend/node_modules
+frontend/dist
+docker/embedding
+.codex
+.agents

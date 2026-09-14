@@ -18,6 +18,8 @@ class ValueESRepository:
     """负责字段取值全文索引的创建 写入和基础检索"""
 
     index_name = "value_index"
+    # 内置部署使用单节点 Elasticsearch，不创建无法分配的副本分片。
+    index_settings = {"number_of_replicas": 0}
     # value 字段使用 IK 分词，这样地区 会员等级 品类等中文值才能按全文方式检索
     index_mappings = {
         "dynamic": False,
@@ -39,7 +41,9 @@ class ValueESRepository:
         """确保字段取值索引已经创建好"""
         if not await self.client.indices.exists(index=self.index_name):
             await self.client.indices.create(
-                index=self.index_name, mappings=self.index_mappings
+                index=self.index_name,
+                mappings=self.index_mappings,
+                settings=self.index_settings,
             )
 
     async def index(self, value_infos: list[ValueInfo], batch_size=20):

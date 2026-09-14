@@ -91,19 +91,19 @@ function FlowNodeCard({ node, status }: { node: FlowNode; status: FlowStatus }) 
       <div
         className={cn(
           "flex h-10 items-center gap-2 border px-3 text-sm font-semibold shadow-line transition",
-          status === "pending" && "border-ink/10 bg-white/55 text-ink/45",
-          status === "running" && "border-brass/45 bg-brass/15 text-ink",
-          status === "success" && "border-moss/25 bg-moss/10 text-ink",
-          status === "error" && "border-tomato/35 bg-tomato/10 text-tomato",
+          status === "pending" && "border-slate/10 bg-white/70 text-slate/45",
+          status === "running" && "border-accent/45 bg-accent/10 text-accent",
+          status === "success" && "border-emerald-500/30 bg-emerald-50 text-emerald-800",
+          status === "error" && "border-danger/35 bg-danger/10 text-danger",
         )}
       >
         <span
           className={cn(
             "grid h-6 w-6 shrink-0 place-items-center rounded-full",
-            status === "pending" && "bg-ink/5 text-ink/35",
-            status === "running" && "bg-brass/20 text-brass",
-            status === "success" && "bg-moss/15 text-moss",
-            status === "error" && "bg-tomato/15 text-tomato",
+            status === "pending" && "bg-slate/5 text-slate/35",
+            status === "running" && "bg-accent/20 text-accent",
+            status === "success" && "bg-emerald-100 text-emerald-700",
+            status === "error" && "bg-danger/15 text-danger",
           )}
         >
           <NodeIcon status={status} />
@@ -120,10 +120,10 @@ export function StepRail({ steps = [] }: { steps?: StepState[] }) {
   const statusMap = getStatusMap(steps);
 
   return (
-    <section className="mt-4 border border-ink/10 bg-white/40 px-3 py-4 shadow-line">
+    <section className="mt-4 rounded-xl border border-accent/10 bg-white/65 px-3 py-4 shadow-line">
       <div className="mb-3 flex items-center justify-between gap-3 px-1">
-        <div className="text-sm font-semibold text-ink">执行流程</div>
-        <div className="text-xs text-ink/45">LangGraph</div>
+        <div className="text-sm font-semibold text-slate">执行流程</div>
+        <div className="text-xs text-slate/45">LangGraph</div>
       </div>
 
       <div className="overflow-x-auto">
@@ -143,14 +143,14 @@ export function StepRail({ steps = [] }: { steps?: StepState[] }) {
                 refX="6"
                 refY="4"
               >
-                <path d="M0 0 L8 4 L0 8 Z" fill="rgba(32,32,29,0.58)" />
+                <path d="M0 0 L8 4 L0 8 Z" fill="rgba(19,35,63,0.48)" />
               </marker>
             </defs>
             {connectors.map((path) => (
               <path
                 key={path}
                 d={path}
-                stroke="rgba(32,32,29,0.5)"
+                stroke="rgba(37,99,235,0.38)"
                 strokeWidth="1.5"
                 markerEnd="url(#flow-arrow)"
               />
@@ -160,7 +160,7 @@ export function StepRail({ steps = [] }: { steps?: StepState[] }) {
                 key={label.text}
                 x={label.x}
                 y={label.y}
-                fill="rgba(32,32,29,0.62)"
+                fill="rgba(19,35,63,0.62)"
                 fontSize="13"
                 fontWeight="600"
               >

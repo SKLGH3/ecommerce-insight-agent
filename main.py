@@ -1,10 +1,4 @@
-"""
-FastAPI 应用入口
-
-负责创建后端应用实例，注册应用生命周期函数，并把各业务模块中的 router
-挂载到同一个 app 上。HTTP 请求会先进入这里创建的 app，再按路由分发到
-具体的接口处理函数。
-"""
+"""FastAPI 应用入口。"""
 
 import uuid
 
@@ -14,18 +8,25 @@ from app.api.lifespan import lifespan
 from app.api.routers.query_router import query_router
 from app.core.context import request_id_ctx_var
 
-# lifespan 交给 FastAPI 管理，用于在服务启动和关闭时统一初始化与释放外部客户端
-app = FastAPI(lifespan=lifespan)
-
-# 把查询路由注册进应用；没有挂载时，/docs 和真实 HTTP 请求都访问不到该接口
+app = FastAPI(
+    title="电商智能问数平台",
+    description="基于元数据检索与受控 NL2SQL 的电商数据分析服务",
+    version="0.2.0",
+    lifespan=lifespan,
+)
 app.include_router(query_router)
 
 
 @app.middleware("http")
 async def add_request_id(request: Request, call_next):
-    # 请求被处理之前
-    request_id = uuid.uuid4()
-    request_id_ctx_var.set(request_id)
-    response = await call_next(request)
-    # 请求被处理之后
-    return response
+    """为每个 HTTP 请求注入独立 request_id。"""
+
+    request_id_ctx_var.set(uuid.uuid4())
+    return await call_next(request)
+
+
+@app.get("/health", tags=["system"])
+async def health_check():
+    """供 Docker 与外部负载均衡器探测进程存活状态。"""
+
+    return {"status": "ok", "service": "ecommerce-insight-agent"}

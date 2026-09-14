@@ -19,7 +19,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
   return (
     <article className={cn("group flex gap-3", isUser && "justify-end")}>
       {!isUser && (
-        <div className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ink text-parchment">
+        <div className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-accent text-white shadow-md shadow-accent/20">
           <Bot className="h-4 w-4" aria-hidden="true" />
         </div>
       )}
@@ -27,10 +27,10 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
       <div className={cn("max-w-[920px] flex-1", isUser && "flex max-w-[760px] justify-end")}>
         <div
           className={cn(
-            "relative border px-5 py-4 shadow-line",
+            "relative rounded-2xl border px-5 py-4 shadow-line",
             isUser
-              ? "border-ink/80 bg-ink text-parchment"
-              : "border-ink/10 bg-[#fffaf1]/78 text-ink backdrop-blur",
+              ? "border-midnight bg-midnight text-cloud shadow-lg shadow-midnight/10"
+              : "border-accent/10 bg-white/88 text-slate backdrop-blur",
           )}
         >
           <div className="flex items-start justify-between gap-3">
@@ -39,7 +39,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
               <button
                 type="button"
                 onClick={copy}
-                className="shrink-0 rounded-full p-1.5 text-ink/45 opacity-0 outline-none transition hover:bg-ink/5 hover:text-ink focus:opacity-100 focus:ring-2 focus:ring-moss/40 group-hover:opacity-100"
+                className="shrink-0 rounded-full p-1.5 text-slate/45 opacity-0 outline-none transition hover:bg-slate/5 hover:text-slate focus:opacity-100 focus:ring-2 focus:ring-brand/40 group-hover:opacity-100"
                 title="复制"
                 aria-label="复制"
               >
@@ -49,7 +49,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
           </div>
 
           {message.error && (
-            <div className="mt-3 border border-tomato/30 bg-tomato/10 px-3 py-2 text-sm text-tomato">
+            <div className="mt-3 border border-danger/30 bg-danger/10 px-3 py-2 text-sm text-danger">
               {message.error}
             </div>
           )}
@@ -60,7 +60,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
           <div
             className={cn(
               "mt-3 text-xs",
-              isUser ? "text-parchment/55" : "text-ink/45",
+              isUser ? "text-cloud/55" : "text-slate/45",
             )}
           >
             {formatTime(message.createdAt)}
@@ -69,7 +69,7 @@ export function MessageBubble({ message }: { message: ChatMessage }) {
       </div>
 
       {isUser && (
-        <div className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-moss text-white">
+        <div className="mt-1 grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-brand text-white shadow-md shadow-brand/20">
           <UserRound className="h-4 w-4" aria-hidden="true" />
         </div>
       )}
